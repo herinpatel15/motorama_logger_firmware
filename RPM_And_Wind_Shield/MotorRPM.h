@@ -25,28 +25,30 @@ void setupMotorRPM() {
 void updateMotorRPM() {
   static unsigned long lastUpdateTime = 0;
   unsigned long currentTime = millis();
-  
+
   // Update RPM every second
   if (currentTime - lastUpdateTime >= 1000) {
     detachInterrupt(digitalPinToInterrupt(MOTOR_RPM_PIN));
-    
+
     unsigned long timeElapsed = currentTime - lastMotorTime;
     if (timeElapsed > 0) {
       motorRPM = (motorPulseCount * 60000.0) / (timeElapsed * pulsesPerRevolution);
     } else {
       motorRPM = 0.0;
     }
-    
+    // Serial.print("motorRPM= ");
+    // Serial.print(motorRPM);
     motorPulseCount = 0;
     lastMotorTime = currentTime;
     lastUpdateTime = currentTime;
-    
+
     attachInterrupt(digitalPinToInterrupt(MOTOR_RPM_PIN), countMotorPulses, FALLING);
   }
 }
 
 float getMotorRPM() {
   // return motorRPM;
+
   return 15;
 }
 
