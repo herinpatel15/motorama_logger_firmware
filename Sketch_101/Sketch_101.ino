@@ -30,6 +30,7 @@ String ssid;
 String password;
 
 unsigned long lastTime_log = 0;
+unsigned long debug_log_time = 0;
 unsigned long lastOperationalCheck = 0;
 unsigned long operationalSeconds = 0;
 TaskHandle_t rpmTaskHandle = NULL;
@@ -262,7 +263,7 @@ void loop() {
   // Serial.printf("WindSpeed: %.2f\tCFM: %.2f\n", windspeed, air_Flow_Volume);
 
   if (millis() - lastOperationalCheck >= 1000) {
-    if (current > 0.1) {
+    if (current > 0.05) {
       operationalSeconds++;
       if (operationalSeconds >= 60) {
         operatioanl_time++;
@@ -276,26 +277,40 @@ void loop() {
     lastLogTime = millis();
   }
 
-  if ((now.minute() == 59) && now.second() < 3) {
+  if (millis() - debug_log_time >= 5000) {  // 5000 ms = 5 seconds
+    debug_log_time = millis();
+
+    // Your data print here
+    Serial.printf("WindSpeed: %.2f\tCFM: %.2f\n", windspeed, air_Flow_Volume);
+    Serial.printf("TIME: %02d:%02d:%02d %02d/%02d/%04d\n",
+                  now.hour(), now.minute(), now.second(),
+                  now.day(), now.month(), now.year());
+  }
+
+  // if ((now.minute() == 59) && now.second() < 3) {
+  //   delay(1000);
+  //   pzem.resetEnergy();
+  //   Serial.printf("END ENERGY: %d\n", totalEnergy);
+  //   totalEnergy = 0;
+  //   operatioanl_time = 0;
+  //   // DateTime nowStart = rtc.now();
+  //   Serial.printf("END TIME: %02d:%02d:%02d %02d/%02d/%04d\n",
+  //                 now.hour(), now.minute(), now.second(),
+  //                 now.day(), now.month(), now.year());
+  //   createOrOpenFile();
+  // }
+
+  if (now.hour() == 23 && now.minute() == 59 && now.second() >= 57) {
     delay(1000);
     pzem.resetEnergy();
     Serial.printf("END ENERGY: %d\n", totalEnergy);
     totalEnergy = 0;
     operatioanl_time = 0;
-    // DateTime nowStart = rtc.now();
     Serial.printf("END TIME: %02d:%02d:%02d %02d/%02d/%04d\n",
                   now.hour(), now.minute(), now.second(),
                   now.day(), now.month(), now.year());
     createOrOpenFile();
   }
-
-  // if (now.hour() == 23 && now.minute() == 59 && now.second() >= 57) {
-  //   delay(1000);
-  //   pzem.resetEnergy();
-  //   totalEnergy = 0;
-  //   operatioanl_time = 0;
-  //   createOrOpenFile();
-  // }
 
   // Serial.printf("Data send :)");
 }
